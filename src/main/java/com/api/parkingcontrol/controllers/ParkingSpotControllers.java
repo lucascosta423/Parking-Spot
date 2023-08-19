@@ -2,6 +2,7 @@ package com.api.parkingcontrol.controllers;
 
 import com.api.parkingcontrol.dtos.ParkingSpotDto;
 import com.api.parkingcontrol.models.ParkingSpotModel;
+import com.api.parkingcontrol.services.CarroService;
 import com.api.parkingcontrol.services.ParkingSpotService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
@@ -27,16 +28,20 @@ public class ParkingSpotControllers {
 
   @Autowired
   ParkingSpotService parkingSpotService;
+  CarroService carroService;
   @PostMapping
   public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDto parkingSpotDto){
-    if (parkingSpotService.existsByLicensePlateCar(parkingSpotDto.getLicensePlateCar())){
-      return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: License Plate Car is already in use");
-    }
     if (parkingSpotService.existsByParkingSpotNumber(parkingSpotDto.getParkingSpotNumber())){
       return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Parking Spot is already in use!");
     }
     if (parkingSpotService.existsByApartmentAndBlock(parkingSpotDto.getApartment(), parkingSpotDto.getBlock())){
       return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Apartment and Block is already in use");
+    }
+    if (parkingSpotService.existsByApartmentAndBlock(parkingSpotDto.getApartment(), parkingSpotDto.getBlock())){
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Apartment and Block is already in use");
+    }
+    if (carroService.existsById(parkingSpotDto.getCarroId())){
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Carro já cadastrado em uma vaga");
     }
 
     var parkingSpotModel = new ParkingSpotModel();
